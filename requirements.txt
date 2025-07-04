@@ -1,0 +1,63 @@
+# Core Kivy framework for Android GUI
+kivy>=2.1.0
+kivymd>=1.1.1
+
+# Voice Recognition (offline)
+vosk>=0.3.45
+pyaudio>=0.2.11
+SpeechRecognition>=3.10.0
+
+# Text-to-Speech (offline)
+pyttsx3>=2.90
+
+# Audio processing
+sounddevice>=0.4.6
+numpy>=1.21.0
+
+# Security and encryption
+cryptography>=41.0.0
+
+# HTTP requests for online features
+requests>=2.31.0
+urllib3>=2.0.0
+
+# JSON and data handling
+jsonschema>=4.0.0
+
+# Date and time utilities
+python-dateutil>=2.8.0
+
+# Android specific dependencies
+plyer>=2.1.0  # For device features like notifications, camera, etc.
+pyjnius>=1.4.0  # For Java integration on Android
+android>=0.1.0  # Android-specific utilities
+
+# Optional: API integrations
+openai>=0.27.0  # For ChatGPT integration
+python-telegram-bot>=20.0  # For Telegram integration
+PyYAML>=6.0  # For configuration files
+
+# Weather API
+pyowm>=3.3.0
+
+# Unit conversion
+pint>=0.22
+
+# Natural language processing
+nltk>=3.8
+spacy>=3.6.0
+
+# Performance and monitoring
+psutil>=5.9.0
+
+# Utilities
+pathlib>=1.0.1
+typing-extensions>=4.0.0
+
+# Development and testing
+pytest>=7.0.0
+pytest-mock>=3.10.0
+
+# Build tools for Android
+buildozer>=1.5.0
+cython>=0.29.0
