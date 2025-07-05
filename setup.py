@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+"""
+Setup script for JARVIS AI Assistant
+"""
+
+from setuptools import setup, find_packages
+import os
+
+# Read README file
+def read_readme():
+    readme_path = os.path.join(os.path.dirname(__file__), 'README.md')
+    if os.path.exists(readme_path):
+        with open(readme_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    return "JARVIS - Just A Rather Very Intelligent System"
+
+# Read requirements
+def read_requirements():
+    req_path = os.path.join(os.path.dirname(__file__), 'requirements.txt')
+    if os.path.exists(req_path):
+        with open(req_path, 'r', encoding='utf-8') as f:
+            return [line.strip() for line in f if line.strip() and not line.startswith('#')]
+    return []
+
+setup(
+    name="jarvis-ai-assistant",
+    version="1.0.0",
+    description="A smart AI assistant for mobile devices with offline and online capabilities",
+    long_description=read_readme(),
+    long_description_content_type="text/markdown",
+    author="JARVIS Team",
+    author_email="jarvis@example.com",
+    url="https://github.com/jarvis-ai/jarvis-assistant",
+    packages=find_packages(),
+    include_package_data=True,
+    install_requires=read_requirements(),
+    extras_require={
+        'dev': [
+            'pytest>=7.0.0',
+            'pytest-mock>=3.10.0',
+            'black>=22.0.0',
+            'flake8>=4.0.0',
+            'mypy>=0.950',
+        ],
+        'android': [
+            'buildozer>=1.5.0',
+            'cython>=0.29.0',
+        ]
+    },
+    python_requires=">=3.8",
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: End Users/Desktop",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        "Topic :: Software Development :: User Interfaces",
+        "Topic :: Multimedia :: Sound/Audio :: Speech",
+    ],
+    keywords="ai assistant voice recognition android mobile jarvis",
+    entry_points={
+        'console_scripts': [
+            'jarvis=main:main',
+        ],
+    },
+    package_data={
+        'jarvis': [
+            'data/*',
+            'models/*',
+            'ui/*',
+            'core/*',
+            'plugins/*',
+        ],
+    },
+    zip_safe=False,
+)
