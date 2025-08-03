@@ -1,0 +1,200 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #f5f5f5;
+    padding: 40px 20px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    background-color: white;
+    border: 3px dashed #d1d5db;
+    border-radius: 20px;
+    padding: 40px;
+    position: relative;
+}
+
+.content-wrapper {
+    display: flex;
+    gap: 60px;
+    align-items: flex-start;
+}
+
+.left-section {
+    flex: 1;
+    max-width: 400px;
+}
+
+.right-section {
+    flex: 0 0 auto;
+    min-width: 280px;
+}
+
+.main-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.description {
+    font-size: 1rem;
+    color: #4b5563;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+.sample-text {
+    font-size: 0.95rem;
+    color: #374151;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.audio-player {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 20px;
+    background-color: #f9fafb;
+    border-radius: 50px;
+    border: 1px solid #e5e7eb;
+    max-width: 300px;
+}
+
+.play-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #6366f1;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.play-button:hover {
+    background-color: #5048e5;
+}
+
+.audio-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background-color: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background-color: #6366f1;
+    border-radius: 2px;
+    transition: width 0.1s ease;
+}
+
+.feature-name {
+    font-size: 0.9rem;
+    color: #6366f1;
+    font-weight: 600;
+}
+
+.signup-section {
+    text-align: center;
+    padding: 20px;
+}
+
+.signup-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 12px;
+}
+
+.signup-description {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+
+.signup-button {
+    background-color: #6366f1;
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-bottom: 20px;
+    min-width: 120px;
+}
+
+.signup-button:hover {
+    background-color: #5048e5;
+}
+
+.signin-text {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.signin-link {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.signin-link:hover {
+    text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        padding: 30px 25px;
+        margin: 20px;
+    }
+    
+    .content-wrapper {
+        flex-direction: column;
+        gap: 40px;
+    }
+    
+    .main-title {
+        font-size: 2rem;
+    }
+    
+    .right-section {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .audio-player {
+        max-width: 100%;
+    }
+}
