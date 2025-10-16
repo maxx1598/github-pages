@@ -1,0 +1,92 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.email == "admin@chikki.world";
+    }
+    
+    function isValidFileSize(maxSizeMB) {
+      return resource.size < maxSizeMB * 1024 * 1024;
+    }
+    
+    function isValidImageType() {
+      return resource.contentType.matches('image/.*');
+    }
+    
+    function isValidProjectFileType() {
+      return resource.contentType in [
+        'text/html',
+        'text/css', 
+        'text/javascript',
+        'application/javascript',
+        'text/plain',
+        'image/png',
+        'image/jpeg',
+        'image/jpg',
+        'image/gif',
+        'image/svg+xml',
+        'application/zip',
+        'application/x-zip-compressed'
+      ];
+    }
+
+    // User avatars
+    match /avatars/{userId}/{fileName} {
+      // Allow read for all authenticated users
+      allow read: if isAuthenticated();
+      
+      // Allow write only for the user themselves or admin
+      allow write: if (isAuthenticated() && isOwner(userId) || isAdmin()) &&
+                      isValidImageType() &&
+                      isValidFileSize(5); // 5MB limit for avatars
+      
+      // Allow delete only for the user themselves or admin
+      allow delete: if (isAuthenticated() && isOwner(userId)) || isAdmin();
+    }
+
+    // Project files
+    match /projects/{projectId}/{fileName} {
+      // Allow read for all authenticated users (project visibility is handled by Firestore rules)
+      allow read: if isAuthenticated();
+      
+      // Allow write only for authenticated users with valid file types and size
+      allow write: if isAuthenticated() &&
+                      isValidProjectFileType() &&
+                      isValidFileSize(50); // 50MB limit for project files
+      
+      // Allow delete only for admin (project owners delete through Firestore cascade)
+      allow delete: if isAdmin();
+    }
+
+    // Temporary uploads (for processing)
+    match /temp/{userId}/{fileName} {
+      // Allow read/write only for the user themselves
+      allow read, write: if isAuthenticated() && isOwner(userId) &&
+                            isValidProjectFileType() &&
+                            isValidFileSize(50);
+      
+      // Allow delete for user or admin
+      allow delete: if (isAuthenticated() && isOwner(userId)) || isAdmin();
+    }
+
+    // Admin can access everything
+    match /{allPaths=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

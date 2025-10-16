@@ -1,0 +1,159 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             (request.auth.token.email == "admin@chikki.world" || 
+              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+    }
+    
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'username', 'displayName', 'email']) &&
+             data.uid is string &&
+             data.username is string &&
+             data.displayName is string &&
+             data.email is string &&
+             data.username.size() >= 3 &&
+             data.username.size() <= 30 &&
+             data.displayName.size() >= 1 &&
+             data.displayName.size() <= 100;
+    }
+    
+    function isValidProject(data) {
+      return data.keys().hasAll(['ownerId', 'title', 'description', 'category']) &&
+             data.ownerId is string &&
+             data.title is string &&
+             data.description is string &&
+             data.category is string &&
+             data.title.size() >= 1 &&
+             data.title.size() <= 200 &&
+             data.description.size() >= 1 &&
+             data.description.size() <= 2000 &&
+             data.category in ['web', 'game', 'tool', 'other'];
+    }
+    
+    function isValidComment(data) {
+      return data.keys().hasAll(['projectId', 'authorId', 'text']) &&
+             data.projectId is string &&
+             data.authorId is string &&
+             data.text is string &&
+             data.text.size() >= 1 &&
+             data.text.size() <= 1000;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Allow read for all authenticated users
+      allow read: if isAuthenticated();
+      
+      // Allow create only for the user themselves
+      allow create: if isAuthenticated() && 
+                       isOwner(userId) && 
+                       isValidUser(request.resource.data) &&
+                       request.resource.data.uid == request.auth.uid;
+      
+      // Allow update only for the user themselves or admin
+      allow update: if isAuthenticated() && 
+                       (isOwner(userId) || isAdmin()) &&
+                       isValidUser(request.resource.data) &&
+                       request.resource.data.uid == resource.data.uid; // Can't change uid
+      
+      // Allow delete only for admin
+      allow delete: if isAdmin();
+    }
+
+    // Projects collection
+    match /projects/{projectId} {
+      // Allow read for published public projects, or owner, or admin
+      allow read: if (resource.data.isPublished == true && resource.data.visibility == 'public') ||
+                     (isAuthenticated() && isOwner(resource.data.ownerId)) ||
+                     isAdmin();
+      
+      // Allow create only for authenticated users with valid data
+      allow create: if isAuthenticated() && 
+                       isValidProject(request.resource.data) &&
+                       request.resource.data.ownerId == request.auth.uid;
+      
+      // Allow update only for owner or admin
+      allow update: if isAuthenticated() && 
+                       (isOwner(resource.data.ownerId) || isAdmin()) &&
+                       isValidProject(request.resource.data) &&
+                       request.resource.data.ownerId == resource.data.ownerId; // Can't change owner
+      
+      // Allow delete only for owner or admin
+      allow delete: if isAuthenticated() && 
+                       (isOwner(resource.data.ownerId) || isAdmin());
+    }
+
+    // Comments collection
+    match /comments/{commentId} {
+      // Allow read for all authenticated users
+      allow read: if isAuthenticated();
+      
+      // Allow create only for authenticated users with valid data
+      allow create: if isAuthenticated() && 
+                       isValidComment(request.resource.data) &&
+                       request.resource.data.authorId == request.auth.uid;
+      
+      // Allow update only for comment author or admin
+      allow update: if isAuthenticated() && 
+                       (isOwner(resource.data.authorId) || isAdmin()) &&
+                       isValidComment(request.resource.data) &&
+                       request.resource.data.authorId == resource.data.authorId; // Can't change author
+      
+      // Allow delete only for comment author or admin
+      allow delete: if isAuthenticated() && 
+                       (isOwner(resource.data.authorId) || isAdmin());
+    }
+
+    // Likes collection
+    match /likes/{likeId} {
+      // Allow read for all authenticated users
+      allow read: if isAuthenticated();
+      
+      // Allow create only for authenticated users
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid;
+      
+      // Allow delete only for the user who created the like or admin
+      allow delete: if isAuthenticated() && 
+                       (isOwner(resource.data.userId) || isAdmin());
+      
+      // No updates allowed for likes
+      allow update: if false;
+    }
+
+    // Subscriptions collection
+    match /subscriptions/{subscriptionId} {
+      // Allow read for all authenticated users
+      allow read: if isAuthenticated();
+      
+      // Allow create only for authenticated users
+      allow create: if isAuthenticated() && 
+                       request.resource.data.subscriberId == request.auth.uid &&
+                       request.resource.data.subscriberId != request.resource.data.targetUserId; // Can't subscribe to self
+      
+      // Allow delete only for the subscriber or admin
+      allow delete: if isAuthenticated() && 
+                       (isOwner(resource.data.subscriberId) || isAdmin());
+      
+      // No updates allowed for subscriptions
+      allow update: if false;
+    }
+
+    // Admin-only collections and operations
+    match /{document=**} {
+      // Admin can read/write everything
+      allow read, write: if isAdmin();
+    }
+  }
+}
